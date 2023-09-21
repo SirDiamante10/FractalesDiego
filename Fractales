@@ -1,0 +1,65 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
+public class FractalC extends JPanel {
+
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 800;
+    private static final double RE_MIN = -1.0;
+    private static final double RE_MAX = 1.0;
+    private static final double IM_MIN = -1.0;
+    private static final double IM_MAX = 1.0;
+    private static final int MAX_ITER = 1500;
+
+    private BufferedImage image;
+
+    public FractalC() {
+        image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+        calculateJulia();
+    }
+
+    private void calculateJulia() {
+        double cRe = -0.72;
+        double cIm = 0.27015;
+
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                double zx = map(x, 0, WIDTH, RE_MIN, RE_MAX);
+                double zy = map(y, 0, HEIGHT, IM_MIN, IM_MAX);
+                int iter = 0;
+                while (zx * zx + zy * zy < 4 && iter < MAX_ITER) {
+                    double tmp = zx * zx - zy * zy + cRe;
+                    zy = 2.0 * zx * zy + cIm;
+                    zx = tmp;
+                    iter++;
+                }
+                int color = Color.HSBtoRGB((float) iter / MAX_ITER, 1, 5);
+                image.setRGB(x, y, color);
+            }
+        }
+    }
+
+    private double map(double value, double start1, double stop1, double start2, double stop2) {
+        return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(image, 0, 0, this);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Julia Fractal");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.add(new FractalC());
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
+    }
+}
