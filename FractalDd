@@ -1,0 +1,61 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
+public class FractalDd extends JPanel {
+
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 800;
+    private static final int MAX_DEPTH = 4;
+
+    private BufferedImage image;
+
+    public FractalDd() {
+        image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+        Graphics2D g2d = image.createGraphics();
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, WIDTH, HEIGHT);
+
+        drawDice(WIDTH / 4, HEIGHT / 4, WIDTH / 2, MAX_DEPTH);
+
+        g2d.dispose();
+    }
+
+    private void drawDice(int x, int y, int size, int depth) {
+        if (depth == 0) {
+            Graphics2D g2d = image.createGraphics();
+            g2d.setColor(Color.RED);
+            g2d.drawRect(x, y, size, size);
+            g2d.dispose();
+        } else {
+            int newSize = size / 3;
+            drawDice(x, y, newSize, depth - 1); // Cuadro superior izquierdo
+            drawDice(x + newSize, y, newSize, depth - 1); // Cuadro superior medio
+            drawDice(x + 2 * newSize, y, newSize, depth - 1); // Cuadro superior derecho
+            drawDice(x, y + newSize, newSize, depth - 1); // Cuadro centro izquierdo
+            drawDice(x + 2 * newSize, y + newSize, newSize, depth - 1); // Cuadro centro derecho
+            drawDice(x, y + 2 * newSize, newSize, depth - 1); // Cuadro inferior izquierdo
+            drawDice(x + newSize, y + 2 * newSize, newSize, depth - 1); // Cuadro inferior medio
+            drawDice(x + 2 * newSize, y + 2 * newSize, newSize, depth - 1); // Cuadro inferior derecho
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(image, 0, 0, this);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Dice Fractal");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.add(new FractalDd());
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
+    }
+}
