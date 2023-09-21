@@ -1,0 +1,65 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.Path2D;
+import java.awt.image.BufferedImage;
+
+public class FractalT extends JPanel {
+
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 800;
+    private static final int MAX_DEPTH = 5;
+
+    private BufferedImage image;
+
+    public FractalT() {
+        image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+        Graphics2D g2d = image.createGraphics();
+        g2d.setColor(Color.BLUE);
+        g2d.fillRect(0, 0, WIDTH, HEIGHT);
+
+        drawTriforce(WIDTH / 4, HEIGHT / 2, WIDTH / 2, MAX_DEPTH);
+
+        g2d.dispose();
+    }
+
+    private void drawTriforce(int x, int y, int size, int depth) {
+        if (depth == 0) {
+            Graphics2D g2d = image.createGraphics();
+            g2d.setColor(Color.YELLOW);
+            int[] xPoints = {x, x + size, x + size / 2};
+            int[] yPoints = {y, y, y - size};
+            Path2D path = new Path2D.Double();
+            path.moveTo(xPoints[0], yPoints[0]);
+            for (int i = 1; i < 3; i++) {
+                path.lineTo(xPoints[i], yPoints[i]);
+            }
+            path.closePath();
+            g2d.fill(path);
+            g2d.dispose();
+        } else {
+            int newSize = size / 2;
+            drawTriforce(x, y, newSize, depth - 1);
+            drawTriforce(x + newSize, y, newSize, depth - 1);
+            drawTriforce(x + newSize / 2, y - newSize, newSize, depth - 1);
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(image, 0, 0, this);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Triforce Fractal");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.add(new FractalT());
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
+    }
+}
