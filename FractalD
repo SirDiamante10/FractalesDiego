@@ -1,0 +1,57 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
+public class FractalD extends JPanel {
+
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 800;
+    private static final int MAX_DEPTH = 10;
+
+    private BufferedImage image;
+
+    public FractalD() {
+        image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+        drawDiamondFractal(10, 10, WIDTH, HEIGHT, 0);
+    }
+
+    private void drawDiamondFractal(int x, int y, int width, int height, int depth) {
+        if (depth >= MAX_DEPTH) {
+            return;
+        }
+
+        int halfWidth = width / 2;
+        int halfHeight = height / 2;
+
+        // Dibujar el cuadrado central
+        Graphics2D g = image.createGraphics();
+        g.setColor(Color.CYAN);
+        g.fillRect(x + halfWidth / 4, y + halfHeight / 4, halfWidth / 2, halfHeight / 2);
+        g.dispose();
+
+        // Llamadas recursivas para los cuatro cuadrantes
+        drawDiamondFractal(x, y, halfWidth, halfHeight, depth + 1); // Arriba izquierda
+        drawDiamondFractal(x + halfWidth, y, halfWidth, halfHeight, depth + 1); // Arriba derecha
+        drawDiamondFractal(x, y + halfHeight, halfWidth, halfHeight, depth + 1); // Abajo izquierda
+        drawDiamondFractal(x + halfWidth, y + halfHeight, halfWidth, halfHeight, depth + 1); // Abajo derecha
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(image, 0, 0, this);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Diamond Fractal");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.add(new FractalD());
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
+    }
+}
